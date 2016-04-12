@@ -1,9 +1,11 @@
 package com.example.vladimir.weather.model;
 
+import java.io.Serializable;
+
 /**
  * Created by Vladimir on 18.02.2016.
  */
-public class WeatherCondition5DTO {
+public class WeatherCondition5DTO implements Serializable {
 
     private int id;
     private String main;
@@ -40,5 +42,15 @@ public class WeatherCondition5DTO {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    @Override
+    public String toString() {
+        return "WeatherCondition5DTO{" +
+                "id=" + id +
+                ", main='" + main + '\'' +
+                ", description='" + description + '\'' +
+                ", icon='" + icon + '\'' +
+                '}';
     }
 }

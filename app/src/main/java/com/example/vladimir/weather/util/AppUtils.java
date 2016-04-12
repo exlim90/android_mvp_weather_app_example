@@ -20,183 +20,43 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.SimpleFormatter;
 
 /**
  * Created by Vladimir on 03.03.2016.
  */
 public class AppUtils {
+    //2016-04-12 15:00:00
+    public static final String DATE_FORMAT_FROM_SERVER = "dd/MM/yyyy hh:MM:ss";
+    public static final String DATE_FORMAT_FOR_UI_PRESENTER = "dd/MM/yyyy HH:mm:ss";
+    public static final String DATE_FORMAT_JUST_DAY = "E";
 
-    public static WeatherResponseDTO parseWeatherData(String rawJson) {
-        WeatherResponseDTO responseDTO = new WeatherResponseDTO();
+    public static boolean checkIfCityExist(String rawJson) {
+        boolean exist = false;
         try {
-            JSONObject jsonObject = new JSONObject(rawJson);
-            //get root data
-            String cityName = jsonObject.getString("name");
-            long date = jsonObject.getLong("dt");
-
-
-            responseDTO.setCityName(cityName);
-            responseDTO.setDate(date);
-
-            //get 'weather'
-            JSONArray weather = jsonObject.getJSONArray("weather");
-            List<WeatherData> weatherDataList = new ArrayList<WeatherData>();//lista od weather obiekti
-            for (int i = 0; i < weather.length(); i++) {
-                WeatherData data = new WeatherData();//kreirame prazen weather obiekt koj treba da go dodajme vo 'weatherDataList'
-                JSONObject currentWeather = weather.getJSONObject(i);
-                data.setId(currentWeather.getInt("id"));
-                data.setMain(currentWeather.getString("main"));
-                data.setDescription(currentWeather.getString("description"));
-                data.setIcon(currentWeather.getString("icon"));
-
-
-                weatherDataList.add(data);//add weather to the list
+            JSONObject errorObjectJson = new JSONObject(rawJson);
+            int code = errorObjectJson.getInt("cod");
+            if (code == 200) {
+                exist = true;
             }
-            responseDTO.setWeatherData(weatherDataList);
-
-
-            //wind
-            JSONObject windJsonObject = jsonObject.getJSONObject("wind");
-            WindDTO wind = new WindDTO();
-            wind.setSpeed(windJsonObject.getDouble("speed"));
-            wind.setDeg(windJsonObject.getInt("deg"));
-            responseDTO.setWind(wind);
-
-
-            //main
-            JSONObject mainJsonObject = jsonObject.getJSONObject("main");
-            MainDTO main = new MainDTO();
-            main.setTemp(mainJsonObject.getDouble("temp"));
-            main.setHumidity(mainJsonObject.getInt("humidity"));
-            main.setPressure(mainJsonObject.getDouble("pressure"));
-            main.setTemp_max(mainJsonObject.getDouble("temp_max"));
-            main.setTemp_min(mainJsonObject.getDouble("temp_min"));
-
-            responseDTO.setMain(main);
-
-            //sys
-
-            JSONObject sysJsonObject = jsonObject.getJSONObject("sys");
-            SysDTO sys = new SysDTO();
-            sys.setType(sysJsonObject.has("type") ? sysJsonObject.getInt("type") : 0);
-            sys.setId(sysJsonObject.has("id") ? sysJsonObject.getInt("id"):0);
-            sys.setMessage(sysJsonObject.getDouble("message"));
-            sys.setCountry(sysJsonObject.getString("country"));
-            sys.setSunset(sysJsonObject.getLong("sunset"));
-            sys.setSunrise(sysJsonObject.getLong("sunrise"));
-            responseDTO.setSys(sys);
-
-            //clouds
-
-            JSONObject cloudsJsonObject = jsonObject.getJSONObject("clouds");
-            CloudsDTO clouds = new CloudsDTO();
-            clouds.setAll(cloudsJsonObject.getInt("all"));
-            responseDTO.setClouds(clouds);
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return responseDTO;
+        return exist;
     }
 
-    public static WeatherResponse5DTO parseWeatherData5(String rawJson) {
-        WeatherResponse5DTO response5DTO = new WeatherResponse5DTO();
-        try {
-            JSONObject jsonObject = new JSONObject(rawJson);
-
-            // city
-            JSONObject city5DTOJsonObject = jsonObject.getJSONObject("city");
-            City5DTO city = new City5DTO();
-            city.setId(city5DTOJsonObject.getInt("id"));
-            city.setName(city5DTOJsonObject.getString("name"));
-            city.setCountry(city5DTOJsonObject.getString("country"));
-            city.setPopulation(city5DTOJsonObject.getInt("population"));
-
-            if(city5DTOJsonObject.has("coord")){
-                JSONObject cityCoordsJsonObj = city5DTOJsonObject.getJSONObject("coord");
-                Coords cityCoords = new Coords();
-                cityCoords.setLon(cityCoordsJsonObj.getDouble("lon"));
-                cityCoords.setLat(cityCoordsJsonObj.getDouble("lat"));
-                city.setCoords(cityCoords);
-            }
-
-            response5DTO.setCity(city);
+    public static String parseDateToDDmmYYYY(long date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT_FOR_UI_PRESENTER);
+        return simpleDateFormat.format(new Date(date));
+    }
 
 
-            /*//coords
-            JSONObject coordsJsonObject = jsonObject.getJSONObject("coods");
-            Coords coords = new Coords();
-            coords.setLat(coordsJsonObject.getDouble("lat"));
-            coords.setLon(coordsJsonObject.getDouble("lon"));
-            response5DTO.setCoords(coords);*/
-
-
-            //weatherCondition
-
-            JSONArray listJsonArray = jsonObject.getJSONArray("list");
-            List<WeatherData5DTO> weatherData5DTOs = new ArrayList<>();
-            for (int i = 0; i < listJsonArray.length(); i++) {
-                WeatherData5DTO data = new WeatherData5DTO();
-                JSONObject currentWeather = listJsonArray.getJSONObject(i);
-                data.setDate(currentWeather.getLong("dt"));
-                data.setDateText(currentWeather.getString("dt_txt"));
-
-                //main5dto
-                JSONObject main5DTOJsonObject = currentWeather.getJSONObject("main");
-                Main5DTO main = new Main5DTO();
-                main.setTemp(main5DTOJsonObject.getDouble("temp"));
-                main.setHumidity(main5DTOJsonObject.getInt("humidity"));
-                main.setPressure(main5DTOJsonObject.getDouble("pressure"));
-                main.setTemp_max(main5DTOJsonObject.getDouble("temp_max"));
-                main.setTemp_min(main5DTOJsonObject.getDouble("temp_min"));
-                main.setTemp_kf(main5DTOJsonObject.getInt("temp_kf"));
-                data.setMain(main);
-
-                // clouds
-                JSONObject cloudsJsonObject = currentWeather.getJSONObject("clouds");
-                Clouds5DTO clouds = new Clouds5DTO();
-                clouds.setAll(cloudsJsonObject.getInt("all"));
-                data.setClouds5DTO(clouds);
-
-                //sys
-                JSONObject sys5DTOJsonObject = currentWeather.getJSONObject("sys");
-                Sys5DTO sys = new Sys5DTO();
-                sys.setPod(sys5DTOJsonObject.getString("pod"));
-                data.setSys5DTO(sys);
-
-                //wind
-                JSONObject wind5DTOJsonObject = currentWeather.getJSONObject("wind");
-                Wind5DTO wind = new Wind5DTO();
-                wind.setSpeed(wind5DTOJsonObject.getDouble("speed"));
-                wind.setDeg(wind5DTOJsonObject.getDouble("deg"));
-                data.setWind5DTO(wind);
-
-
-                //weather
-                JSONArray weatherArray = currentWeather.getJSONArray("weather");
-                List<WeatherCondition5DTO> weatherCondition5DTOs = new ArrayList<>();
-                for (int j = 0; j < weatherArray.length(); j++) {
-                    WeatherCondition5DTO currentWeatherConditionDTO = new WeatherCondition5DTO();
-                    JSONObject currentConditionWeather = weatherArray.getJSONObject(j);
-                    currentWeatherConditionDTO.setId(currentConditionWeather.getInt("id"));
-                    currentWeatherConditionDTO.setDescription(currentConditionWeather.getString("description"));
-                    currentWeatherConditionDTO.setMain(currentConditionWeather.getString("main"));
-                    currentWeatherConditionDTO.setIcon(currentConditionWeather.getString("icon"));
-
-                    weatherCondition5DTOs.add(currentWeatherConditionDTO);
-                }
-                data.setWeather(weatherCondition5DTOs);
-
-
-                weatherData5DTOs.add(data);
-            }
-            response5DTO.setWeatherData5DTOs(weatherData5DTOs);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return response5DTO;
+    public static String parseDateToDay(long date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_FORMAT_JUST_DAY);
+        return simpleDateFormat.format(new Date(date));
     }
 }

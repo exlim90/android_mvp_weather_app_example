@@ -10,41 +10,41 @@ import android.widget.TextView;
 
 import com.example.vladimir.weather.R;
 import com.example.vladimir.weather.model.WeatherData5DTO;
+import com.example.vladimir.weather.util.AppUtils;
+import com.example.vladimir.weather.util.LogWrapper;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+
+    public static final String TAG = "MyAdapter";
     private List<WeatherData5DTO> itemsData;
     private Context context;
 
-    public MyAdapter(List<WeatherData5DTO> itemsData,Context context) {
+    public MyAdapter(List<WeatherData5DTO> itemsData, Context context) {
         this.itemsData = itemsData;
-        this.context=context;
+        this.context = context;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
     public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                    int viewType) {
-        // create a new view
         View itemLayoutView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_data_weather, null);
-
-        // create ViewHolder
 
         ViewHolder viewHolder = new ViewHolder(itemLayoutView);
         return viewHolder;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
 
-        // - get data from your itemsData at this position
-        // - replace the contents of the view with that itemsData
-
-        viewHolder.day.setText(itemsData.get(position).getDate() + "");
-        // viewHolder.condition.setImageResource(itemsData[position].getImageUrl());
+        viewHolder.day.setText(AppUtils.parseDateToDay(itemsData.get(position).getDate()));
+        LogWrapper.d(TAG, itemsData.get(position).getDate() + " >> " + AppUtils.parseDateToDDmmYYYY(itemsData.get(position).getDate()));
 
         String condition = itemsData.get(position).getWeather().get(0).getDescription();
         String icon = itemsData.get(position).getWeather().get(0).getIcon();
@@ -58,23 +58,22 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     // inner class to hold a reference to each item of RecyclerView
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView day;
-        public TextView condition;
-        public TextView temp;
-        public ImageView icon;
+
+        @Bind(R.id.day)
+        TextView day;
+        @Bind(R.id.condition)
+        TextView condition;
+        @Bind(R.id.temp_maxmin)
+        TextView temp;
+        @Bind(R.id.image)
+        ImageView icon;
 
         public ViewHolder(View itemLayoutView) {
             super(itemLayoutView);
-            day = (TextView) itemLayoutView.findViewById(R.id.day);
-            condition = (TextView) itemLayoutView.findViewById(R.id.condition);
-            temp = (TextView) itemLayoutView.findViewById(R.id.temp_maxmin);
-
-            icon = (ImageView) itemLayoutView.findViewById(R.id.image);
+            ButterKnife.bind(this, itemLayoutView);
         }
     }
 
-
-    // Return the size of your itemsData (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return itemsData.size();

@@ -8,20 +8,25 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.vladimir.weather.R;
+import com.example.vladimir.weather.model.WeatherData5DTO;
+import com.example.vladimir.weather.model.WeatherResponse5DTO;
+import com.example.vladimir.weather.mvp.presenter.MainPagePresenter;
+import com.example.vladimir.weather.mvp.presenter.MainPagePresenterImp;
+import com.example.vladimir.weather.mvp.view.MainPageView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MainPage extends Activity {
+public class MainPage extends Activity implements MainPageView<WeatherResponse5DTO>, View.OnClickListener {
 
-
-    //MyObject object = new MyObject();
     private static final String TAG = "MainPage";
     public static final String API_URL_MAIN = "http://api.openweathermap.org/data/2.5/weather?q=[city]&appid=5ae54136c3bce516d6b06adf29a91489&units=metric";
     public static final String API_URL_FORECASt = "http://api.openweathermap.org/data/2.5/forecast?q=[city]&mode=json&appid=5ae54136c3bce516d6b06adf29a91489&units=metric";
@@ -35,7 +40,13 @@ public class MainPage extends Activity {
 
     @Bind(R.id.txt_result)
     TextView txt_result;
+
+    @Bind(R.id.progressBar)
+    ProgressBar progressBar;
+
     Context context;
+
+    private MainPagePresenter presenter;
 
 
     @Override
@@ -45,28 +56,8 @@ public class MainPage extends Activity {
         Log.d(TAG, "onCreate called");
         context = this;
         ButterKnife.bind(this);
-
-
-        btn_enter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "klikna ENtER :))");
-                if (edt_cityName.getText().toString().equals("")) {
-                    Toast.makeText(context, "Please enter city name !!!", Toast.LENGTH_LONG).show();
-                } else {
-                    //Toast.makeText(context,edt_cityName.getText().toString(),Toast.LENGTH_LONG).show();
-
-                    Intent intent = new Intent(MainPage.this, WeatherDetailsActivity.class);
-                    intent.putExtra("cityNameExtraParam", edt_cityName.getText().toString());
-                    startActivity(intent);
-
-                    //GetWeatherData request = new GetWeatherData(txt_result);
-                    //request.execute(API_URL.replace("[city]", edt_cityName.getText().toString()));
-                }
-
-            }
-        });
-
+        btn_enter.setOnClickListener(this);
+        presenter = new MainPagePresenterImp(this);
     }
 
     @Override
@@ -78,16 +69,62 @@ public class MainPage extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void showProgress() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void setCityError() {
+        edt_cityName.setError(getString(R.string.hint_enter_city_name));
+    }
+
+    @Override
+    public void showError(String message) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void navigateWeatherDetails(WeatherResponse5DTO result) {
+        Log.d(TAG, "result=" + result);
+        Intent intent = new Intent(MainPage.this, WeatherDetailsActivity.class);
+        intent.putExtra("cityNameExtraParam", edt_cityName.getText().toString());
+        intent.putExtra("result", result);
+        startActivity(intent);
+        //finish();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_enter:
+                Log.d(TAG, "onClick btn_enter");
+                hideKeyboard();
+                presenter.validateCity(edt_cityName.getText().toString());
+                break;
+        }
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
     }
 }

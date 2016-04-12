@@ -1,11 +1,12 @@
 package com.example.vladimir.weather.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Vladimir on 18.02.2016.
  */
-public class WeatherData5DTO {
+public class WeatherData5DTO implements Serializable {
 
     private long date;
     private String dateText;
@@ -70,5 +71,18 @@ public class WeatherData5DTO {
 
     public void setSys5DTO(Sys5DTO sys5DTO) {
         this.sys5DTO = sys5DTO;
+    }
+
+    @Override
+    public String toString() {
+        return "WeatherData5DTO{" +
+                "date=" + date +
+                ", dateText='" + dateText + '\'' +
+                ", main=" + main +
+                ", weather=" + weather +
+                ", clouds5DTO=" + clouds5DTO +
+                ", wind5DTO=" + wind5DTO +
+                ", sys5DTO=" + sys5DTO +
+                '}';
     }
 }

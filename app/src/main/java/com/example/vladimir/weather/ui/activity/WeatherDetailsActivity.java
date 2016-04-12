@@ -8,8 +8,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.vladimir.weather.R;
-import com.example.vladimir.weather.async.GetWeather5Data;
-import com.example.vladimir.weather.async.GetWeatherData;
+import com.example.vladimir.weather.adapter.MyAdapter;
+import com.example.vladimir.weather.model.Main5DTO;
+import com.example.vladimir.weather.model.WeatherCondition5DTO;
+import com.example.vladimir.weather.model.WeatherData;
+import com.example.vladimir.weather.model.WeatherResponse5DTO;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -34,37 +37,58 @@ public class WeatherDetailsActivity extends Activity {
     private String cityNameParam;
 
     @Bind(R.id.weatherRecyclerView)
-    private RecyclerView mRecyclerView;
+    RecyclerView mRecyclerView;
+
+    WeatherResponse5DTO weatherResponse5DTO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather_details);
-        /*mRecyclerView = (RecyclerView) findViewById(R.id.weatherRecyclerView);
-        cityName = (TextView) findViewById(R.id.cityName);
-        icon = (ImageView) findViewById(R.id.icon);
-        temp = (TextView) findViewById(R.id.temp);
-        condition = (TextView) findViewById(R.id.condition);*/
         ButterKnife.bind(this);
 
         if (getIntent().getExtras() != null && getIntent().hasExtra("cityNameExtraParam")) {
             cityNameParam = getIntent().getExtras().getString("cityNameExtraParam");
         }
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
+        if (getIntent().getExtras() != null && getIntent().hasExtra("result")) {
+            weatherResponse5DTO = (WeatherResponse5DTO) getIntent().getExtras().getSerializable("result");
+        }
+
+
+        initView();
+        showResults(weatherResponse5DTO);
+    }
+
+    private void initView() {
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
         mLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
+    }
 
-        GetWeatherData request = new GetWeatherData(this, cityName, icon, temp, condition);
-        request.execute(MainPage.API_URL_MAIN.replace("[city]", cityNameParam));
+    private void showResults(WeatherResponse5DTO weatherResponse5DTO) {
+        cityName.setText(weatherResponse5DTO.getCity().getName());
+        if (weatherResponse5DTO != null) {
+            if (weatherResponse5DTO.getWeatherData5DTOs().get(0).getWeather().get(0) != null) {
+                WeatherCondition5DTO weather = weatherResponse5DTO.getWeatherData5DTOs().get(0).getWeather().get(0);
+                condition.setText(weather.getDescription());
+                icon.setImageResource(getResources().getIdentifier(
+                        "a_" + weather.getIcon(), "drawable", getPackageName()));
+            }
 
-        GetWeather5Data request5 = new GetWeather5Data(this, mRecyclerView);
-        request5.execute(MainPage.API_URL_FORECASt.replace("[city]", cityNameParam));
+            if (weatherResponse5DTO.getWeatherData5DTOs().get(0).getMain() != null) {
+                Main5DTO main = weatherResponse5DTO.getWeatherData5DTOs().get(0).getMain();
+                temp.setText(main.getTemp() + " \u2103");
+            }
+        }
 
+
+        if (weatherResponse5DTO.getWeatherData5DTOs() != null) {
+            MyAdapter adapter = new MyAdapter(weatherResponse5DTO.getWeatherData5DTOs(), this);
+            mRecyclerView.setAdapter(adapter);
+        }
     }
 }

@@ -1,11 +1,12 @@
 package com.example.vladimir.weather.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Vladimir on 16.02.2016.
  */
-public class WeatherResponse5DTO {
+public class WeatherResponse5DTO implements Serializable{
     private City5DTO city;
     private String cod;
     private double message;

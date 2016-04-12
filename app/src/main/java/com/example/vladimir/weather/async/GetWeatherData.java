@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.example.vladimir.weather.model.WeatherData;
 import com.example.vladimir.weather.model.WeatherResponseDTO;
+import com.example.vladimir.weather.parser.WeatherDataParser;
 import com.example.vladimir.weather.util.AppUtils;
 
 import org.apache.http.HttpResponse;
@@ -88,7 +89,7 @@ public class GetWeatherData extends AsyncTask<String, Integer, String> {
 
 
         if (rawJson != null && checkIfCityExist(rawJson)) {
-            WeatherResponseDTO response = AppUtils.parseWeatherData(rawJson);
+            WeatherResponseDTO response = WeatherDataParser.parseWeatherData(rawJson);
             cityName.setText(response.getCityName());
 
             temp.setText(response.getMain().getTemp() + " \u2103");

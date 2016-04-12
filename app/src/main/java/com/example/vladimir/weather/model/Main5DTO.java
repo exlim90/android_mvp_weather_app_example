@@ -1,9 +1,11 @@
 package com.example.vladimir.weather.model;
 
+import java.io.Serializable;
+
 /**
  * Created by Vladimir on 18.02.2016.
  */
-public class Main5DTO {
+public class Main5DTO implements Serializable {
     private double temp;
     private double pressure;
     private int humidity;
@@ -57,5 +59,17 @@ public class Main5DTO {
 
     public void setTemp_kf(int temp_kf) {
         this.temp_kf = temp_kf;
+    }
+
+    @Override
+    public String toString() {
+        return "Main5DTO{" +
+                "temp=" + temp +
+                ", pressure=" + pressure +
+                ", humidity=" + humidity +
+                ", temp_min=" + temp_min +
+                ", temp_max=" + temp_max +
+                ", temp_kf=" + temp_kf +
+                '}';
     }
 }

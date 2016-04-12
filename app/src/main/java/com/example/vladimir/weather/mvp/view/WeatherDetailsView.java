@@ -1,11 +1,13 @@
 package com.example.vladimir.weather.mvp.view;
 
-public interface MainPageView<T> {
+/**
+ * Created by Vladimir on 4/12/2016.
+ */
+public interface WeatherDetailsView<T> {
+
     void showProgress();
 
     void hideProgress();
-
-    void setCityError();
 
     void showError(String message);
 

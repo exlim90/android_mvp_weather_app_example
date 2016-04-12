@@ -1,9 +1,11 @@
 package com.example.vladimir.weather.model;
 
+import java.io.Serializable;
+
 /**
  * Created by Vladimir on 18.02.2016.
  */
-public class Coords {
+public class Coords implements Serializable {
 
     private double lon;
     private double lat;

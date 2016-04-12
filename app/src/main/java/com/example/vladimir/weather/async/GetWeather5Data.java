@@ -1,16 +1,13 @@
 package com.example.vladimir.weather.async;
 
-import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.vladimir.weather.adapter.MyAdapter;
 import com.example.vladimir.weather.model.WeatherResponse5DTO;
+import com.example.vladimir.weather.mvp.iteractor.MainPageInteractor;
+import com.example.vladimir.weather.parser.WeatherDataParser;
 import com.example.vladimir.weather.util.AppUtils;
+import com.example.vladimir.weather.util.LogWrapper;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -19,8 +16,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,23 +25,13 @@ import java.io.IOException;
  */
 public class GetWeather5Data extends AsyncTask<String, Integer, String> {
 
-    private TextView txt_result;
+    public static final String TAG = "GetWeather5Data";
+    MainPageInteractor.OnWeatherLoadFinishedListener<WeatherResponse5DTO> listener;
 
-    private TextView cityName;
-    private ImageView icon;
-    private TextView temp;
-    private TextView condition;
-    private Context context;
-    RecyclerView recyclerView;
-
-    public GetWeather5Data(TextView result) {
-        this.txt_result = result;
+    public GetWeather5Data(MainPageInteractor.OnWeatherLoadFinishedListener<WeatherResponse5DTO> listener) {
+        this.listener = listener;
     }
 
-    public GetWeather5Data(Context context,RecyclerView recyclerView) {
-        this.context = context;
-        this.recyclerView=recyclerView;
-    }
 
     @Override
     protected String doInBackground(String... params) {
@@ -64,51 +49,25 @@ public class GetWeather5Data extends AsyncTask<String, Integer, String> {
             } else {
                 //Closes the connection.
                 response.getEntity().getContent().close();
-                Log.d("error getting data", statusLine.getReasonPhrase());
-                Toast.makeText(context, statusLine.getReasonPhrase(), Toast.LENGTH_LONG).show();
-                //throw new IOException(statusLine.getReasonPhrase());
-                //responseString = statusLine.getReasonPhrase();
+                LogWrapper.d("GetWeatherData", "statusLine=" + statusLine.getReasonPhrase());
+                listener.onCityNotFound(statusLine.getReasonPhrase());
             }
         } catch (ClientProtocolException e) {
-            //TODO Handle problems..
+            LogWrapper.d(TAG, e.getMessage());
         } catch (IOException e) {
-            //TODO Handle problems..
+            LogWrapper.d(TAG, e.getMessage());
         }
         return responseString;
     }
 
     @Override
     protected void onPostExecute(String rawJson) {
-        Log.d("GetWeatherData", rawJson);
-        if (txt_result != null && rawJson != null) {
-            txt_result.setText(rawJson);
-        }
-
-
-        if (rawJson != null && checkIfCityExist(rawJson)) {
-            WeatherResponse5DTO response = AppUtils.parseWeatherData5(rawJson);
-            if(response.getWeatherData5DTOs()!=null){
-                MyAdapter adapter=new MyAdapter(response.getWeatherData5DTOs(), context);
-                recyclerView.setAdapter(adapter);
-            }
+        LogWrapper.d("GetWeatherData", "rawJson=" + rawJson);
+        if (rawJson != null && AppUtils.checkIfCityExist(rawJson)) {
+            WeatherResponse5DTO response = WeatherDataParser.parseWeatherData5(rawJson);
+            listener.onSuccess(response);
         } else {
-            Toast.makeText(context, "City does not exist !!", Toast.LENGTH_LONG).show();
+            listener.onCityNotFound("City does not exist !!");
         }
     }
-
-    private boolean checkIfCityExist(String rawJson) {
-        boolean exist = false;
-        try {
-            JSONObject errorObjectJson = new JSONObject(rawJson);
-            int code = errorObjectJson.getInt("cod");
-            if (code == 200) {
-                exist = true;
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return exist;
-    }
-
-
 }
