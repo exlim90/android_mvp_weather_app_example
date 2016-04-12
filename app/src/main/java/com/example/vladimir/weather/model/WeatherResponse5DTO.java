@@ -1,16 +1,23 @@
 package com.example.vladimir.weather.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Vladimir on 16.02.2016.
  */
-public class WeatherResponse5DTO implements Serializable{
+public class WeatherResponse5DTO implements Serializable {
     private City5DTO city;
     private String cod;
     private double message;
+
+    @SerializedName("list")
     private List<WeatherData5DTO> weatherData5DTOs;
+
+    private Map<String, List<WeatherData5DTO>> groupedWeathers;
 
     //create geteri i seteri
 
@@ -46,5 +53,24 @@ public class WeatherResponse5DTO implements Serializable{
 
     public List<WeatherData5DTO> getWeatherData5DTOs() {
         return weatherData5DTOs;
+    }
+
+    public Map<String, List<WeatherData5DTO>> getGroupedWeathers() {
+        return groupedWeathers;
+    }
+
+    public void setGroupedWeathers(Map<String, List<WeatherData5DTO>> groupedWeathers) {
+        this.groupedWeathers = groupedWeathers;
+    }
+
+    @Override
+    public String toString() {
+        return "WeatherResponse5DTO{" +
+                "city=" + city +
+                ", cod='" + cod + '\'' +
+                ", message=" + message +
+                ", weatherData5DTOs=" + weatherData5DTOs +
+                ", groupedWeathers=" + groupedWeathers +
+                '}';
     }
 }

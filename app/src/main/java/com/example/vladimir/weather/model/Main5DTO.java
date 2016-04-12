@@ -11,7 +11,7 @@ public class Main5DTO implements Serializable {
     private int humidity;
     private double temp_min;
     private double temp_max;
-    private int temp_kf;
+    private double temp_kf;
 
     public double getTemp() {
         return temp;
@@ -53,11 +53,11 @@ public class Main5DTO implements Serializable {
         this.temp_max = temp_max;
     }
 
-    public int getTemp_kf() {
+    public double getTemp_kf() {
         return temp_kf;
     }
 
-    public void setTemp_kf(int temp_kf) {
+    public void setTemp_kf(double temp_kf) {
         this.temp_kf = temp_kf;
     }
 

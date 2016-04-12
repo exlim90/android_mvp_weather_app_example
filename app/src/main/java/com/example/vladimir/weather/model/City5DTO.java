@@ -63,4 +63,15 @@ public class City5DTO  implements Serializable {
     public void setId(int id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return "City5DTO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", country='" + country + '\'' +
+                ", population=" + population +
+                ", coords=" + coords +
+                '}';
+    }
 }

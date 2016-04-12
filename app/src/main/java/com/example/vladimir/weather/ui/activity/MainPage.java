@@ -15,12 +15,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.vladimir.weather.App;
 import com.example.vladimir.weather.R;
+import com.example.vladimir.weather.api.ApiService;
 import com.example.vladimir.weather.model.WeatherData5DTO;
 import com.example.vladimir.weather.model.WeatherResponse5DTO;
 import com.example.vladimir.weather.mvp.presenter.MainPagePresenter;
 import com.example.vladimir.weather.mvp.presenter.MainPagePresenterImp;
 import com.example.vladimir.weather.mvp.view.MainPageView;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -29,8 +33,10 @@ public class MainPage extends Activity implements MainPageView<WeatherResponse5D
 
     private static final String TAG = "MainPage";
     public static final String API_URL_MAIN = "http://api.openweathermap.org/data/2.5/weather?q=[city]&appid=5ae54136c3bce516d6b06adf29a91489&units=metric";
-    public static final String API_URL_FORECASt = "http://api.openweathermap.org/data/2.5/forecast?q=[city]&mode=json&appid=5ae54136c3bce516d6b06adf29a91489&units=metric";
+    public static final String API_URL_FORECAST = "http://api.openweathermap.org/data/2.5/forecast?q=[city]&mode=json&appid=5ae54136c3bce516d6b06adf29a91489&units=metric";
 
+    @Inject
+    ApiService apiService;
 
     @Bind(R.id.edt_cityName)
     EditText edt_cityName;
@@ -54,6 +60,8 @@ public class MainPage extends Activity implements MainPageView<WeatherResponse5D
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
         Log.d(TAG, "onCreate called");
+        App.getComponent().inject(this);
+
         context = this;
         ButterKnife.bind(this);
         btn_enter.setOnClickListener(this);

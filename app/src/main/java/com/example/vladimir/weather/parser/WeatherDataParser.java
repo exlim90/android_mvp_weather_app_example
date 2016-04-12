@@ -15,18 +15,35 @@ import com.example.vladimir.weather.model.WeatherResponse5DTO;
 import com.example.vladimir.weather.model.WeatherResponseDTO;
 import com.example.vladimir.weather.model.Wind5DTO;
 import com.example.vladimir.weather.model.WindDTO;
+import com.example.vladimir.weather.util.AppUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Vladimir on 4/12/2016.
  */
 public class WeatherDataParser {
+
+    public static WeatherResponse5DTO groupParsedWeatherData5(WeatherResponse5DTO weatherResponseDTO) {
+        Map<String, List<WeatherData5DTO>> weatherGroups = new HashMap<>();
+        for (WeatherData5DTO weatherCondition5DTO : weatherResponseDTO.getWeatherData5DTOs()) {
+            String keyDate = AppUtils.parseDateDDmmYYYY(weatherCondition5DTO.getDateText());
+            List<WeatherData5DTO> list = weatherGroups.get(keyDate) != null ? weatherGroups.get(keyDate) : new ArrayList<WeatherData5DTO>(1);
+            list.add(weatherCondition5DTO);
+            weatherGroups.put(keyDate, list);
+        }
+        weatherResponseDTO.setGroupedWeathers(weatherGroups);
+        return weatherResponseDTO;
+    }
+
+
     public static WeatherResponseDTO parseWeatherData(String rawJson) {
         WeatherResponseDTO responseDTO = new WeatherResponseDTO();
         try {
@@ -80,7 +97,7 @@ public class WeatherDataParser {
             JSONObject sysJsonObject = jsonObject.getJSONObject("sys");
             SysDTO sys = new SysDTO();
             sys.setType(sysJsonObject.has("type") ? sysJsonObject.getInt("type") : 0);
-            sys.setId(sysJsonObject.has("id") ? sysJsonObject.getInt("id"):0);
+            sys.setId(sysJsonObject.has("id") ? sysJsonObject.getInt("id") : 0);
             sys.setMessage(sysJsonObject.getDouble("message"));
             sys.setCountry(sysJsonObject.getString("country"));
             sys.setSunset(sysJsonObject.getLong("sunset"));
@@ -113,7 +130,7 @@ public class WeatherDataParser {
             city.setCountry(city5DTOJsonObject.getString("country"));
             city.setPopulation(city5DTOJsonObject.getInt("population"));
 
-            if(city5DTOJsonObject.has("coord")){
+            if (city5DTOJsonObject.has("coord")) {
                 JSONObject cityCoordsJsonObj = city5DTOJsonObject.getJSONObject("coord");
                 Coords cityCoords = new Coords();
                 cityCoords.setLon(cityCoordsJsonObj.getDouble("lon"));
@@ -122,15 +139,6 @@ public class WeatherDataParser {
             }
 
             response5DTO.setCity(city);
-
-
-            /*//coords
-            JSONObject coordsJsonObject = jsonObject.getJSONObject("coods");
-            Coords coords = new Coords();
-            coords.setLat(coordsJsonObject.getDouble("lat"));
-            coords.setLon(coordsJsonObject.getDouble("lon"));
-            response5DTO.setCoords(coords);*/
-
 
             //weatherCondition
 
@@ -187,12 +195,12 @@ public class WeatherDataParser {
                     weatherCondition5DTOs.add(currentWeatherConditionDTO);
                 }
                 data.setWeather(weatherCondition5DTOs);
-
-
                 weatherData5DTOs.add(data);
             }
             response5DTO.setWeatherData5DTOs(weatherData5DTOs);
 
+            //group weather data
+            groupParsedWeatherData5(response5DTO);
         } catch (JSONException e) {
             e.printStackTrace();
         }

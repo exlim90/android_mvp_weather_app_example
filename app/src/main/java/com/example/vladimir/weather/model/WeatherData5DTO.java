@@ -1,5 +1,7 @@
 package com.example.vladimir.weather.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -7,13 +9,17 @@ import java.util.List;
  * Created by Vladimir on 18.02.2016.
  */
 public class WeatherData5DTO implements Serializable {
-
+    @SerializedName("dt")
     private long date;
+    @SerializedName("dt_txt")
     private String dateText;
     private Main5DTO main;
     private List<WeatherCondition5DTO> weather;
+    @SerializedName("clouds")
     private Clouds5DTO clouds5DTO;
+    @SerializedName("wind")
     private Wind5DTO wind5DTO;
+    @SerializedName("sys")
     private Sys5DTO sys5DTO;
 
 

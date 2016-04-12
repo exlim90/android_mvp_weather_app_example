@@ -1,9 +1,9 @@
 package com.example.vladimir.weather.mvp.presenter;
 
-import com.example.vladimir.weather.model.WeatherData5DTO;
 import com.example.vladimir.weather.model.WeatherResponse5DTO;
 import com.example.vladimir.weather.mvp.iteractor.MainPageInteractor;
 import com.example.vladimir.weather.mvp.iteractor.MainPageInteractorImp;
+import com.example.vladimir.weather.mvp.iteractor.RetrofitMainPageInteractorImp;
 import com.example.vladimir.weather.mvp.view.MainPageView;
 
 /**
@@ -15,7 +15,8 @@ public class MainPagePresenterImp implements MainPagePresenter, MainPageInteract
 
     public MainPagePresenterImp(MainPageView view) {
         this.view = view;
-        interactor = new MainPageInteractorImp();
+        //MainPageInteractorImp
+        interactor = new RetrofitMainPageInteractorImp();
     }
 
     @Override

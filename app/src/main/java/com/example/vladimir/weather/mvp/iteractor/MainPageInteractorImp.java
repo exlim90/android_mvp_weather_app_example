@@ -10,6 +10,6 @@ public class MainPageInteractorImp implements MainPageInteractor {
     @Override
     public void loadCityData(String city, OnWeatherLoadFinishedListener listener) {
         GetWeather5Data weather5Data = new GetWeather5Data(listener);
-        weather5Data.execute(MainPage.API_URL_FORECASt.replace("[city]", city));
+        weather5Data.execute(MainPage.API_URL_FORECAST.replace("[city]", city));
     }
 }
