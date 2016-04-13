@@ -69,7 +69,6 @@ public class WeatherDetailsActivity extends Activity {
 
     private void initView() {
         mRecyclerView.setHasFixedSize(true);
-        // use a linear layout manager
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
         mLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mRecyclerView.setLayoutManager(mLayoutManager);

@@ -15,7 +15,7 @@ public class MainPagePresenterImp implements MainPagePresenter, MainPageInteract
 
     public MainPagePresenterImp(MainPageView view) {
         this.view = view;
-        //MainPageInteractorImp
+        //interactor = new MainPageInteractorImp();
         interactor = new RetrofitMainPageInteractorImp();
     }
 

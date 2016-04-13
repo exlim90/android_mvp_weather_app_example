@@ -18,6 +18,7 @@ import retrofit2.Response;
 public class RetrofitMainPageInteractorImp implements MainPageInteractor {
 
     public static final String TAG = "RetrofitMainPageInteractorImp";
+
     @Inject
     ApiService apiService;
 
