@@ -4,6 +4,10 @@ import android.util.Log;
 
 import com.example.vladimir.weather.BuildConfig;
 
+/**
+ * @author Vladimir Angeleski
+ */
+
 public class LogWrapper {
 
     public static void d(String tag, String message) {
@@ -35,5 +39,4 @@ public class LogWrapper {
             Log.e(tag, message, e);
         }
     }
-
 }

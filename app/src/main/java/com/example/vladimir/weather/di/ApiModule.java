@@ -8,6 +8,7 @@ import com.example.vladimir.weather.api.ApiService;
 import com.example.vladimir.weather.util.LogWrapper;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -41,20 +42,30 @@ public class ApiModule {
 
     @Singleton
     @Provides
-    ApiService provideApiService(OkHttpClient client) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(ApiService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
+    ApiService provideApiService(OkHttpClient client, Retrofit retrofit) {
+
 
         return retrofit.create(ApiService.class);
     }
 
     @Singleton
     @Provides
+    Retrofit provideRetrofit(OkHttpClient client) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(ApiService.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build();
+        return retrofit;
+    }
+
+    @Singleton
+    @Provides
     OkHttpClient provideOkHttpClient() {
-        OkHttpClient client = new OkHttpClient.Builder()
+        OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
+        builder.readTimeout(10, TimeUnit.SECONDS);
+        builder.connectTimeout(5, TimeUnit.SECONDS);
+        builder
                 .addInterceptor(
                         new Interceptor() {
                             @Override
@@ -79,8 +90,8 @@ public class ApiModule {
                                 }
                                 return chain.proceed(request);
                             }
-                        }).build();
+                        });
 
-        return client;
+        return builder.build();
     }
 }
